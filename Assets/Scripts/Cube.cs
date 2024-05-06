@@ -4,9 +4,10 @@ using UnityEngine;
 public class Cube : MonoBehaviour
 {
     [SerializeField] private float _chanceSeparation = 100;
+    private Renderer _renderer;
 
     public event Action<Cube> OnDestroyed;
-    private Renderer _renderer;
+    public event Action<Cube> OnDetonation;
 
     private void Start()
     {
@@ -21,11 +22,17 @@ public class Cube : MonoBehaviour
         if (_chanceSeparation >= random)
         {
             _chanceSeparation /= _coefficientChange;
-            Debug.Log(_chanceSeparation);
-            Debug.Log(random);
             OnDestroyed?.Invoke(this);
         }
+        else
+        {
+            Detonation();
+            Destroy(gameObject);
+        }
+    }
 
-        Destroy(gameObject);
+    private void Detonation()
+    {
+        OnDetonation?.Invoke(this);
     }
 }

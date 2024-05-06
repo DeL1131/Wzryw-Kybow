@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -13,6 +14,7 @@ public class GameManager : MonoBehaviour
         {
             Cube cube = Instantiate(_cubePrefab, _points[i].transform.position, Quaternion.identity);
             cube.OnDestroyed += CreateCubes;
+            cube.OnDetonation += DetonationCube;
         }
     }
 
@@ -27,7 +29,34 @@ public class GameManager : MonoBehaviour
         {
             Cube newCube = Instantiate(cube, cube.transform.position, Quaternion.identity);
             newCube.OnDestroyed += CreateCubes;
-            newCube.GetComponent<Rigidbody>().AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
+            newCube.OnDetonation += DetonationCube;
+           // newCube.GetComponent<Rigidbody>().AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
         }
+    }
+
+    private void DetonationCube(Cube cube)
+    {
+        Explode(cube);
+    }
+
+    private void Explode(Cube cube)
+    {
+        foreach (Rigidbody explodableObject in GetExplodableObjects(cube))
+            explodableObject.AddExplosionForce(_explosionForce, cube.transform.position, _explosionRadius);
+    }
+
+    private List<Rigidbody> GetExplodableObjects(Cube cube)
+    {
+        Collider[] hits = Physics.OverlapSphere(cube.transform.position, _explosionRadius);
+
+        List<Rigidbody> cubes = new();
+
+        foreach (Collider hit in hits)
+        {
+           if(hit.attachedRigidbody != null)
+                cubes.Add(hit.attachedRigidbody);
+        }
+
+        return cubes;
     }
 }
