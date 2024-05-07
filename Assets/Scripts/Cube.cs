@@ -1,9 +1,12 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Renderer))]
+                                                    
 public class Cube : MonoBehaviour
 {
     [SerializeField] private float _chanceSeparation = 100;
+
     private Renderer _renderer;
 
     public event Action<Cube> OnDestroyed;
@@ -26,12 +29,12 @@ public class Cube : MonoBehaviour
         }
         else
         {
-            Detonation();
+            DetonationCube();
             Destroy(gameObject);
         }
     }
 
-    private void Detonation()
+    private void DetonationCube()
     {
         OnDetonation?.Invoke(this);
     }
